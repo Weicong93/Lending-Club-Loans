@@ -1,1 +1,9 @@
+# Virtualenv files
+venv/
 
+# dot env with username, pw, db
+*.env
+
+
+# Byte-compiled, cached, optimized files
+__pycache__/
