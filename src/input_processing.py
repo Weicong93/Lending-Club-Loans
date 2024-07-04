@@ -33,3 +33,14 @@ def validate(input_dict):
                 errors.append(f'bmi field must be numeric.')
 
     return errors
+
+
+
+# class DataProcess:
+#     def __init__(self):
+#         self.new_input = pd.read_csv("../new_inputs/lc_testset.csv")
+
+#     def OHE(self, features):
+
+
+
