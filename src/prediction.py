@@ -1,9 +1,26 @@
 import pandas as pd
 import numpy as np
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split, KFold, GridSearchCV
+from sklearn import metrics
 from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.metrics import roc_auc_score
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import GradientBoostingClassifier
+from lightgbm import LGBMClassifier
+from catboost import CatBoostClassifier
 import seaborn as sns
+import matplotlib.pyplot as plt
 from datetime import date, datetime
 import statistics
+import warnings
+import plotly.express as px
+from xgboost import XGBClassifier
+import joblib
+
+model = joblib.load('model/CatBoost_model.pkl')
+
+warnings.filterwarnings("ignore")
 
 df = pd.read_csv("new_inputs/lc_testset.csv")
 
@@ -13,13 +30,11 @@ required_features = ['term','int_rate','installment','grade','emp_length',
 
 ]
 
-prediction_features = ['term', 'grade', 'emp_length', 
+prediction_features = ['term', 'grade', 'emp_length','zipcode', 
                        'int_rate', 'revol_util', 'mort_acc',
                        'loan_amnt', 'ID_delta', 'dti',
                        'annual_inc', 'installment', 'ECL_delta',
-                       'open_acc','00813',
-                       '05113', '11650', '22690', '29597',
-                       '30723', '48052', '70466', '86630', '93700']
+                       'open_acc']
 
 #Validate whether required features are found
 
@@ -89,8 +104,19 @@ df['term'] = label_encoder.fit_transform(df['term']) #label encode 60 months = 1
 df['grade'] = label_encoder.fit_transform(df['grade']) # A = 0, B = 1, etc. 
 df['emp_length'] = df['emp_length'].astype(int)
 
-#One-Hot encode zipcode
-zipcode_OH_encoding = pd.get_dummies(df['zipcode'])
-df = pd.concat([df,zipcode_OH_encoding], axis = 1)
+# Match column dtypes with the model's requirement
 
+for col in prediction_features:
+    df[col] = df[col].astype('str')
 
+# Proceed to predict
+
+df['prediction_outcome'] = model.predict(df[prediction_features])
+
+# Export prediction with their respective feature columns
+
+current_time = datetime.now().strftime('%Y%m%d_%H%M%S')
+
+filename = f'new_prediction_{current_time}.csv'
+
+df.to_csv(filename, index=False)
