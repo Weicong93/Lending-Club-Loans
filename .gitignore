@@ -1,5 +1,7 @@
 # Virtualenv files
 venv/
+Archive/
+
 
 # dot env with username, pw, db
 *.env
